@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1,
+            shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet"
+            href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css"
+            integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
+            crossorigin="anonymous">
+
+        <title>Amazon Websample</title>
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Amazon Shopping</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse"
+                data-target="#navbarText" aria-controls="navbarText"
+                aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarText">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="index.html">Home <span
+                                class="sr-only">(current)</span></a>
+                    </li>
+
+                </ul>
+                <span class="navbar-text">
+                    Products
+                </span>
+            </div>
+        </nav>
+        <div class="container mt-5">
+            <h3 style="text-align: center;"> Enter Product Details Here:</h3>
+            <h3 id="alert"></h3>
+            <div class="row justify-content-center mt-4">
+               
+               
+                <form onsubmit="collectproduct(event)" >
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="name" placeholder="Enter name of the product...">
+                         <small id="emailHelp" class="form-text text-muted">We'll never share your Details with anyone else.</small>
+                    </div>
+
+                    <div class="form-group">
+                       <input type="text" class="form-control" id="brand" placeholder="Enter brand...">
+                    </div>
+
+                    <div class="form-group">
+                        <textarea name="description" id="description" placeholder="Enter description.."  rows="2"></textarea>
+                        
+                     </div>
+
+                     <div class="form-group">
+                        <input type="number" class="form-control" id="price" placeholder="Enter price...">
+                     </div>
+
+                     <div class="form-group">
+                        <input type="text" class="form-control" id="imageUrl" placeholder="Give image url...">
+                     </div>
+                    
+                    <button type="submit" class="btn btn-success">Save</button>
+                  </form>
+                
+            </div>
+        </div>
+
+               
+
+
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+            integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+            crossorigin="anonymous"></script>
+        <script
+            src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns"
+            crossorigin="anonymous"></script>
+
+            <script>
+
+const myobj = {}     
+let alertonscreen =  document.querySelector('#alert')
+const url = "https://striveschool-api.herokuapp.com/api/product/"
+    const headers = new Headers ({
+"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MGRjNWU1M2IzNTgxNzAwMTVjMjI2ZmEiLCJpYXQiOjE2MjkyOTA1MjMsImV4cCI6MTYzMDUwMDEyM30.ziMccgD5RNWjjKWf6_FNR0NFvDkIEXHP0fdSDhuogCE",
+"content-type": "application/json"
+})
+
+const getProduct = async()=> {
+
+    
+   
+        const response = await fetch(endpoint,{
+            headers
+        })
+        const data = await response.json()
+        GlobalData = data
+        console.log(data)
+        console.log(GlobalData)
+     
+    document.querySelector('#name').value = data.name,
+    document.querySelector('#brand').value = data.brand,
+    document.querySelector('#description').value = data.description,
+    document.querySelector('#price').value = data.price,
+    document.querySelector('#imageUrl').value = data.imageUrl
+
+  
+   alertonscreen.innerHTML = `<div class="alert alert-warning" role="alert">
+  <h5> You have opted to edit ${data.name} product </h5>
+</div>`
+
+    }
+
+let GlobalData;
+
+const eventId = new URLSearchParams(location.search).get("id")
+const endpoint = eventId ? url + eventId : url
+const method = eventId ? 'PUT' : 'POST'
+if(eventId){
+    getProduct()
+}
+
+
+     const  collectproduct= async (e) =>{
+
+        e.preventDefault()
+        
+                     myobj["name"]        = `${document.querySelector('#name').value}`
+                    myobj["brand"]        = `${document.querySelector('#brand').value}`
+                    myobj["description"]  = `${document.querySelector('#description').value}`
+                    myobj["price"]        = `${document.querySelector('#price').value}`
+                    myobj["imageUrl"]     = `${document.querySelector('#imageUrl').value}`
+
+                    console.log(myobj)
+                    console.log(JSON.stringify(myobj))
+                    
+                    postProduct()
+
+    } 
+    
+                
+    const postProduct = async() => {
+        try {
+
+            const response = await fetch(endpoint,{
+                      method,
+                      body : JSON.stringify(myobj),
+                        headers,
+                        
+                    })
+            if(response.ok){
+                if(eventId){
+                    alertonscreen.innerHTML = `<div class="alert alert-success" role="alert">
+  <h5> Edited Successfully </h5>
+</div>`
+                    alert('product Edited Successfully')
+                   setTimeout(()=> {
+                    location.assign('index.html')
+                   },3000) 
+    
+                }else{
+                    alert('product Posted Successfully')
+                location.assign('index.html')
+                }
+                
+            }
+            
+        } catch (error) {
+            console.log(error)
+        }
+        
+                   
+                    
+    }
+            </script>
+
+    </body>
+</html>
